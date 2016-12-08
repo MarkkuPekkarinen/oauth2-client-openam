@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test OAuth Steps</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/components/bootstrap/css/bootstrap.min.css">
+    <script src="/components/jquery/jquery.min.js"></script>
+    <script src="/components/jquery/purl.js"></script>
+    <script src="/components/tether/js/tether.min.js"></script>
+    <script src="/components/bootstrap/js/bootstrap.min.js"></script>
+
+    <style>
+        .hidden {display: none;}
+    </style>
+
+    <script>
+        $(function() {
+            var baseUrl = "http://domain.com/openam";
+            var realm = "realm";
+            var clientId = "clientId";
+            var clientSecret = "clientSecret";
+
+            var defaultValues = [
+                {
+                    id: "#formAuthPopup",
+                    fields: [
+                        {
+                            id: ":input.url",
+                            defaultValue: baseUrl + "/oauth2/"+realm+"/authorize",
+                        },
+                        {
+                            id: ":input.param[name=realm]",
+                            defaultValue: realm
+                        },
+                        {
+                            id: ":input.param[name=response_type]",
+                            defaultValue: "code"
+                        },
+                        {
+                            id: ":input.param[name=client_id]",
+                            defaultValue: clientId
+                        },
+                        {
+                            id: ":input.param[name=redirect_uri]",
+                            defaultValue: "http://localhost:3000/empty"
+                        },
+                    ]
+                },
+                {
+                    id: "#formAuthApi",
+                    fields: [
+                        {
+                            id: ":input.url",
+                            // defaultValue: "https://gateway.com/authenticate",
+                            defaultValue: baseUrl + "/json/authenticate?realm="+realm,
+                        },
+                        {
+                            id: ":input.return[name=return]",
+                            defaultValue: "body"
+                        },
+                        {
+                            id: ":input.header[name=X-OpenAM-Username]",
+                            defaultValue: ""
+                        },
+                        {
+                            id: ":input.header[name=X-OpenAM-Password]",
+                            defaultValue: ""
+                        },
+                        {
+                            id: ":input.header[name=Content-Type]",
+                            defaultValue: "application/json"
+                        },
+                    ]
+                },
+                {
+                    id: "#formAuthenticate",
+                    fields: [
+                        {
+                            id: ":input.url",
+                            // defaultValue: "https://gateway.com/authorize",
+                            defaultValue: baseUrl + "/oauth2/"+realm+"/authorize",
+                        },
+                        {
+                            id: ":input.return[name=return]",
+                            defaultValue: "redirects"
+                        },
+                        {
+                            id: ":input.header[name=Content-Type]",
+                            defaultValue: "application/x-www-form-urlencoded"
+                        },
+                        {
+                            id: ":input.header[name=Cache-Control]",
+                            defaultValue: "no-cache"
+                        },
+                        {
+                            id: ":input.header[name=save_consent]",
+                            defaultValue: "1"
+                        },
+                        {
+                            id: ":input.header[name=decision]",
+                            defaultValue: "Allow"
+                        },
+                        {
+                            id: ":input.param[name=response_type]",
+                            defaultValue: "code"
+                        },
+                        {
+                            id: ":input.param[name=client_id]",
+                            defaultValue: clientId
+                        },
+                        {
+                            id: ":input.param[name=redirect_uri]",
+                            defaultValue: "http://localhost:3000/empty"
+                        },
+                    ]
+                },
+                {
+                    id: "#formAccessToken",
+                    fields: [
+                        {
+                            id: ":input.url",
+                            // defaultValue: "https://gateway.com/accesstoken",
+                            defaultValue: baseUrl + "/oauth2/"+realm+"/access_token",
+                        },
+                        {
+                            id: ":input.return[name=return]",
+                            defaultValue: "body"
+                        },
+                        {
+                            id: ":input.auth[name=username]",
+                            defaultValue: "",
+                        },
+                        {
+                            id: ":input.auth[name=password]",
+                            defaultValue: "",
+                        },
+                        {
+                            id: ":input.header[name=Content-Type]",
+                            defaultValue: "application/x-www-form-urlencoded"
+                        },
+                        {
+                            id: ":input.header[name=Cache-Control]",
+                            defaultValue: "no-cache"
+                        },
+                        {
+                            id: ":input.param[name=grant_type]",
+                            defaultValue: "authorization_code"
+                        },
+                        {
+                            id: ":input.param[name=realm]",
+                            defaultValue: realm
+                        },
+                        {
+                            id: ":input.param[name=redirect_uri]",
+                            defaultValue: "http://localhost:3000/empty"
+                        },
+                        {
+                            id: ":input.param[name=client_id]",
+                            defaultValue: clientId
+                        },
+                        {
+                            id: ":input.param[name=client_secret]",
+                            defaultValue: clientSecret
+                        },
+                    ]
+                },
+                {
+                    id: "#formCallApi",
+                    fields: [
+                        {
+                            id: ":input.url",
+                            // defaultValue: "https://gateway.com/iptest",
+                            // defaultValue: "https://jsonplaceholder.typicode.com/posts/1",
+                            defaultValue: baseUrl + "/oauth2/"+realm+"/userinfo",
+
+                        },
+                        {
+                            id: ":input.return[name=return]",
+                            defaultValue: "body"
+                        },
+                        {
+                            id: ":input.header[name=Content-Type]",
+                            defaultValue: "application/x-www-form-urlencoded"
+                        },
+                        {
+                            id: ":input.header[name=Cache-Control]",
+                            defaultValue: "no-cache"
+                        },
+                    ]
+                },
+            ];
+
+            // Populate default values
+            $.each(defaultValues, function(indexForm, itemForm){
+                var $form = $(""+itemForm.id);
+                var formFields = itemForm.fields;
+
+                $.each(formFields, function(indexField, itemField){
+                    $form.find(""+itemField.id).val(itemField.defaultValue);
+                });
+            });
+
+            // Toggle Sections
+            $('.toggle_header').on('click', function(event){
+                event.preventDefault();
+                var cssClasses = $(this).attr("class").split(' ');
+                $('.toggle_content.'+cssClasses[1]).toggle();
+            });
+
+
+            var authWindowName = "windowAuth";
+            var authWindowAttrs = 'status=1' +
+                    ',resizable=1' +
+                    ',scrollbars=1' +
+                    ',width=500' +
+                    ',height=500' +
+                    ',left=0' +
+                    ',top=0';
+            var authWindowObject;
+
+            $("#formAuthPopup a.url").click(function(event){
+                event.preventDefault();
+
+                var url = $('#formAuthPopup input.url').val();
+                var params = $('#formAuthPopup input.param').serialize();
+
+                authWindowObject = window.open(url+"?"+params, authWindowName, authWindowAttrs);
+            });
+
+            $("#formAuthPopup").submit(function (event) {
+                event.preventDefault();
+
+                var $form = $(this);
+                var authFinalUrl = authWindowObject.location.href;
+                var code = $.url(authFinalUrl).param('code');
+                $form.find("textarea.response").val(authFinalUrl);
+                console.log(code);
+                $("#formAccessToken").find(":input.param[name=code]").val(code);
+            });
+
+
+            $("#formAuthApi").submit(function (event) {
+                event.preventDefault();
+
+                var $form = $(this);
+                var url = $form.find(':input.url').val();
+                var strReturn = $form.find(':input.return').val();
+                var headers = $form.find(':input.header').serialize();
+                var params = $form.find(':input.param').serialize();
+                var auth = $form.find(':input.auth').serialize();
+
+                $.ajax({
+                    url: "/post",
+                    data: {
+                        url: url,
+                        return: strReturn,
+                        headers: headers,
+                        params: params,
+                        auth: auth,
+                    },
+                    type: "POST",
+                    success: function (data) {
+                        $form.find("textarea.response").val(JSON.stringify(data));
+                        $("#formAuthenticate").find(":input.header[name=Cookie]").val("iPlanetDirectoryPro="+data.tokenId);
+                    }
+                });
+            });
+
+
+            $("#formAuthenticate").submit(function (event) {
+                event.preventDefault();
+
+                var $form = $(this);
+                var url = $form.find(':input.url').val();
+                var strReturn = $form.find(':input.return').val();
+                var headers = $form.find(':input.header').serialize();
+                var params = $form.find(':input.param').serialize();
+                var auth = $form.find(':input.auth').serialize();
+
+                $.ajax({
+                    url: "/get",
+                    data: {
+                        url: url,
+                        return: strReturn,
+                        headers: headers,
+                        params: params,
+                        auth: auth,
+                    },
+                    type: "POST",
+                    success: function (data) {
+                        $form.find("textarea.response").val(JSON.stringify(data));
+                        var redirect = data[data.length-1];
+                        var code = $.url(redirect).param('code');
+                        $("#formAccessToken").find(":input.param[name=code]").val(code);
+                    }
+                });
+            });
+
+
+            $("#formAccessToken").submit(function (event) {
+                event.preventDefault();
+
+                var $form = $(this);
+                var url = $form.find(':input.url').val();
+                var strReturn = $form.find(':input.return').val();
+                var headers = $form.find(':input.header').serialize();
+                var params = $form.find(':input.param').serialize();
+                var auth = $form.find(':input.auth').serialize();
+
+                $.ajax({
+                    url: "/post",
+                    data: {
+                        url: url,
+                        return: strReturn,
+                        headers: headers,
+                        params: params,
+                        auth: auth,
+                    },
+                    type: "POST",
+                    success: function (data) {
+                        $form.find("textarea.response").val(JSON.stringify(data));
+                        $("#formCallApi").find(":input.header[name=Authorization]").val("Bearer "+data.access_token);
+                    }
+                });
+            });
+
+
+            $("#formCallApi").submit(function (event) {
+                event.preventDefault();
+
+                var $form = $(this);
+                var url = $form.find(':input.url').val();
+                var strReturn = $form.find(':input.return').val();
+                var headers = $form.find(':input.header').serialize();
+                var params = $form.find(':input.param').serialize();
+                var auth = $form.find(':input.auth').serialize();
+
+                $.ajax({
+                    url: "/get",
+                    data: {
+                        url: url,
+                        return: strReturn,
+                        headers: headers,
+                        params: params,
+                        auth: auth,
+                    },
+                    type: "POST",
+                    success: function (data) {
+                        $form.find("textarea.response").val(JSON.stringify(data));
+                    }
+                });
+            });
+
+
+        });
+    </script>
+</head>
+
+
+<body>
+    <h1>Test OAuth Steps</h1>
+
+    <p>&nbsp;</p>
+    <h3>OAuth Details</h3>
+    <p>&nbsp;</p>
+
+
+    <div>
+        <h4 class="toggle_header step1-popup">Step 1 - Login Popup</h4>
+        <form id="formAuthPopup" class="toggle_content step1-popup hidden">
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Auth URL (Popup)</label>
+                <div class="col-lg-6"><input type="url" class="form-control url" value=""></div>
+                <label class="col-lg-2"><a href="#" class="url">Open URL (Popup)</a></label>
+            </div>
+
+            <div class="params">
+                <h5>Params</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">realm</label>
+                    <div class="col-lg-8"><input class="form-control param" name="realm" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">response_type</label>
+                    <div class="col-lg-8"><input class="form-control param" name="response_type" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">client_id</label>
+                    <div class="col-lg-8"><input class="form-control param" name="client_id" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">redirect_uri</label>
+                    <div class="col-lg-8"><input class="form-control param" name="redirect_uri" value=""></div>
+                </div>
+            </div>
+
+            <div class="result">
+                <h5>Results</h5>
+                <div class="form-group">
+                    <label>Response</label>
+                    <textarea class="form-control response" rows="3"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <p>&nbsp;</p>
+
+    <div>
+        <h4 class="toggle_header step1a">Step 1a - Login Auth API</h4>
+        <form id="formAuthApi" class="toggle_content step1a hidden">
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Login API URL (POST)</label>
+                <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+            </div>
+
+            <div class="return">
+                <h5>Return</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">return</label>
+                    <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
+                </div>
+            </div>
+
+            <div class="headers">
+                <h5>Headers</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">X-OpenAM-Username</label>
+                    <div class="col-lg-8"><input class="form-control header" name="X-OpenAM-Username" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">X-OpenAM-Password</label>
+                    <div class="col-lg-8"><input class="form-control header" name="X-OpenAM-Password" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">Content-Type</label>
+                    <div class="col-lg-8"><input class="form-control header" name="Content-Type" value=""></div>
+                </div>
+            </div>
+
+            <div class="result">
+                <h5>Results</h5>
+                <div class="form-group">
+                    <label>Response</label>
+                    <textarea class="form-control response" rows="3"></textarea>
+                </div>
+            </div>
+
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <p>&nbsp;</p>
+
+    <div>
+        <h4 class="toggle_header step1b">Step 1b - Authorize (GET)</h4>
+        <form id="formAuthenticate" class="toggle_content step1b hidden">
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Authentication URL</label>
+                <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+            </div>
+
+            <div class="return">
+                <h5>Return</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">return</label>
+                    <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
+                </div>
+            </div>
+
+            <div class="headers">
+                <h5>Headers</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">Cookie</label>
+                    <div class="col-lg-8"><input class="form-control header" name="Cookie" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">Content-Type</label>
+                    <div class="col-lg-8"><input class="form-control header" name="Content-Type" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">Cache-Control</label>
+                    <div class="col-lg-8"><input class="form-control header" name="Cache-Control" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">save_consent</label>
+                    <div class="col-lg-8"><input class="form-control header" name="save_consent" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">decision</label>
+                    <div class="col-lg-8"><input class="form-control header" name="decision" value=""></div>
+                </div>
+            </div>
+
+            <div class="params">
+                <h5>Params</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">response_type</label>
+                    <div class="col-lg-8"><input class="form-control param" name="response_type" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">client_id</label>
+                    <div class="col-lg-8"><input class="form-control param" name="client_id" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">redirect_uri</label>
+                    <div class="col-lg-8"><input class="form-control param" name="redirect_uri" value=""></div>
+                </div>
+            </div>
+
+            <div class="result">
+                <h5>Results</h5>
+                <div class="form-group">
+                    <label>Response</label>
+                    <textarea class="form-control response" rows="3"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <p>&nbsp;</p>
+
+    <div>
+        <h4 class="toggle_header step2">Step 2 - Get Access Token (POST)</h4>
+        <form id="formAccessToken" class="toggle_content step2 hidden">
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Access Token URL</label>
+                <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+            </div>
+
+            <div class="return">
+                <h5>Return</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">return</label>
+                    <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
+                </div>
+            </div>
+
+            <div class="auth">
+                <h5>Basic Auth</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">username</label>
+                    <div class="col-lg-8"><input class="form-control auth" name="username" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">password</label>
+                    <div class="col-lg-8"><input class="form-control auth" name="password" value=""></div>
+                </div>
+            </div>
+
+            <div class="headers">
+                <h5>Headers</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">Content-Type</label>
+                    <div class="col-lg-8"><input class="form-control header" name="Content-Type" value="application/x-www-form-urlencoded"></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">Cache-Control</label>
+                    <div class="col-lg-8"><input class="form-control header" name="Cache-Control" value="no-cache"></div>
+                </div>
+            </div>
+
+            <div class="params">
+                <h5>Params</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">grant_type</label>
+                    <div class="col-lg-8"><input class="form-control param" name="grant_type" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">realm</label>
+                    <div class="col-lg-8"><input class="form-control param" name="realm" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">code</label>
+                    <div class="col-lg-8"><input class="form-control param" name="code" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">redirect_uri</label>
+                    <div class="col-lg-8"><input class="form-control param" name="redirect_uri" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">client_id</label>
+                    <div class="col-lg-8"><input class="form-control param" name="client_id" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">client_secret</label>
+                    <div class="col-lg-8"><input class="form-control param" name="client_secret" value=""></div>
+                </div>
+            </div>
+
+            <div class="result">
+                <h5>Results</h5>
+                <div class="form-group">
+                    <label>Response</label>
+                    <textarea class="form-control response" rows="3"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <p>&nbsp;</p>
+
+    <div>
+        <h4 class="toggle_header step3">Step 3 - Call API with Access Token (GET)</h4>
+        <form id="formCallApi" class="toggle_content step3 hidden">
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">API URL</label>
+                <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+            </div>
+
+            <div class="return">
+                <h5>Return</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">return</label>
+                    <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
+                </div>
+            </div>
+
+            <!--
+            <div class="params">
+                <h5>Params</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">access_token</label>
+                    <div class="col-lg-8"><input class="form-control param" name="access_token" value=""></div>
+                </div>
+            </div>
+            -->
+
+            <div class="headers">
+                <h5>Headers</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">Authorization</label>
+                    <div class="col-lg-8"><input class="form-control header" name="Authorization" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">Content-Type</label>
+                    <div class="col-lg-8"><input class="form-control header" name="Content-Type" value="application/x-www-form-urlencoded"></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">Cache-Control</label>
+                    <div class="col-lg-8"><input class="form-control header" name="Cache-Control" value="no-cache"></div>
+                </div>
+            </div>
+
+            <div class="result">
+                <h5>Results</h5>
+                <div class="form-group">
+                    <label>Response</label>
+                    <textarea class="form-control response" rows="3"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 # Test Client for OAuth2 authorization flow
-
+This client is set-up to work with OpenAM as the identity and OAuth provider.
 
 
 ## Set-up

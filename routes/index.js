@@ -21,6 +21,11 @@ router.get('/empty', function(req, res, next) {
   res.jsonp({});
 });
 
+router.get('/callback', function(req, res, next) {
+
+  res.sendFile(path.join(__dirname+'/../views/html/callback.html'));
+});
+
 router.post('/get', function(req, res, next) {
   var url = req.body.url;
   var strParams = req.body.params;

@@ -42,7 +42,7 @@
                         },
                         {
                             id: ":input.param[name=redirect_uri]",
-                            defaultValue: "http://localhost:3000/empty"
+                            defaultValue: "http://localhost:3000/callback"
                         },
                     ]
                 },
@@ -218,7 +218,7 @@
                     ',top=0';
             var authWindowObject;
 
-            $("#formAuthPopup a.url").click(function(event){
+            $("#formAuthPopup span.url").click(function(event){
                 event.preventDefault();
 
                 var url = $('#formAuthPopup input.url').val();
@@ -226,18 +226,6 @@
 
                 authWindowObject = window.open(url+"?"+params, authWindowName, authWindowAttrs);
             });
-
-            $("#formAuthPopup").submit(function (event) {
-                event.preventDefault();
-
-                var $form = $(this);
-                var authFinalUrl = authWindowObject.location.href;
-                var code = $.url(authFinalUrl).param('code');
-                $form.find("textarea.response").val(authFinalUrl);
-                console.log(code);
-                $("#formAccessToken").find(":input.param[name=code]").val(code);
-            });
-
 
             $("#formAuthApi").submit(function (event) {
                 event.preventDefault();
@@ -350,9 +338,20 @@
                     }
                 });
             });
-
-
         });
+
+        window.winCallback = function(windowChild) {
+            var $form = $('#formAuthPopup');
+
+            var authFinalUrl = windowChild.location.href;
+            var code = $.url(authFinalUrl).param('code');
+            $form.find("textarea.response").val(authFinalUrl);
+            console.log(code);
+
+            $("#formAccessToken").find(":input.param[name=code]").val(code);
+
+            windowChild.close();
+        }
     </script>
 </head>
 
@@ -371,7 +370,7 @@
             <div class="form-group col-lg-12">
                 <label class="col-lg-2">Auth URL (Popup)</label>
                 <div class="col-lg-6"><input type="url" class="form-control url" value=""></div>
-                <label class="col-lg-2"><a href="#" class="url">Open URL (Popup)</a></label>
+                <label class="col-lg-2"><span class="btn-link url">Open URL (Popup)</span></label>
             </div>
 
             <div class="params">
@@ -401,8 +400,6 @@
                     <textarea class="form-control response" rows="3"></textarea>
                 </div>
             </div>
-
-            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
 

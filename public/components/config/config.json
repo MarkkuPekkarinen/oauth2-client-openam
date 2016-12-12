@@ -1,0 +1,15 @@
+{
+  "auth": {
+    "sha1": {
+      "appId": "",
+      "secret": ""
+    },
+
+    "sha256withRSA": {
+      "appId": "",
+      "secret": "",
+      "pem": "",
+      "pw": ""
+    }
+  }
+}

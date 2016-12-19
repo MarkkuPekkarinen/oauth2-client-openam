@@ -8,6 +8,7 @@ const util = require('util');
 const Promise = require('bluebird');
 const _ = require('lodash');
 const querystring = require('querystring');
+const securityHelper = require('../lib/security/security');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -32,14 +33,30 @@ router.post('/get', function(req, res, next) {
   var strHeaders = req.body.headers;
   var strAuth = req.body.auth;
   var strReturn = req.body.return;
+  var strSecurities = req.body.security;
 
   var params = querystring.parse(strParams);
   var headers = querystring.parse(strHeaders);
   var auth = querystring.parse(strAuth);
+  var securities = querystring.parse(strSecurities);
 
   console.log(url);
   console.log(params);
   console.log(headers);
+  console.log(securities);
+
+  // Update headers based on security_level
+  var strAdditionalSecurityHeader = "";
+  if(!_.isUndefined(securities.security_level) && !_.isEmpty(securities.security_level)) {
+    strAdditionalSecurityHeader = securityHelper.generateAuthorizationHeader(url, params, "GET", securities.security_level, securities.client_id, securities.certificate_content, securities.passphrase);
+    if(!_.isEmpty(strAdditionalSecurityHeader)) {
+      var originalAuthHeader = _.get(headers, "Authorization", "");
+      if(!_.isEmpty(originalAuthHeader)) originalAuthHeader = "," + originalAuthHeader;
+      _.set(headers, "Authorization", strAdditionalSecurityHeader + originalAuthHeader);
+
+      console.log(headers);
+    }
+  }
 
   var request = restClient.get(url);
 
@@ -79,16 +96,30 @@ router.post('/post', function(req, res, next) {
   var strHeaders = req.body.headers;
   var strAuth = req.body.auth;
   var strReturn = req.body.return;
+  var strSecurities = req.body.security;
 
   var params = querystring.parse(strParams);
   var headers = querystring.parse(strHeaders);
   var auth = querystring.parse(strAuth);
+  var securities = querystring.parse(strSecurities);
 
   console.log(url);
   console.log(params);
   console.log(headers);
+  console.log(securities);
 
   var request = restClient.post(url);
+
+  // Update headers based on security_level
+  var strAdditionalSecurityHeader = "";
+  if(!_.isUndefined(securities.security_level) && !_.isEmpty(securities.security_level)) {
+    strAdditionalSecurityHeader = securityHelper.generateAuthorizationHeader(url, params, "POST", securities.security_level, securities.client_id, securities.certificate_content, securities.passphrase);
+    if(!_.isEmpty(strAdditionalSecurityHeader)) {
+      var originalAuthHeader = _.get(headers, "Authorization", "");
+      if(!_.isEmpty(originalAuthHeader)) originalAuthHeader = "," + originalAuthHeader;
+      _.set(headers, "Authorization ", strAdditionalSecurityHeader + originalAuthHeader);
+    }
+  }
 
   // Set headers
   if(!_.isUndefined(headers) && !_.isEmpty(headers)) request.set(headers);

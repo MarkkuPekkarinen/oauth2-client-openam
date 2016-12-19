@@ -9,6 +9,7 @@ $ cd {project folder}
 $ npm install
 $ npm start
 ```
+This will run on localhost:3001
 
 
 ## Running

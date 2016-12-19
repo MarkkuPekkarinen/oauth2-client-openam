@@ -14,11 +14,49 @@
     </style>
 
     <script>
+
         $(function() {
             var baseUrl = "http://domain.com/openam";
             var realm = "realm";
             var clientId = "clientId";
             var clientSecret = "clientSecret";
+            var redirectUrl = "http://localhost:3001/callback";
+
+            var atmosphereSecurityClientId = "atmosphereClientId";
+            // L1 password or L2 certificate passphrase
+            var atmospherePassphrase = "atmosphereClientPasswordOrCertPassphrase";
+            // Atmosphere L2 cert need PEM format, private key
+            var atmosphereKeyCertContent = "-----BEGIN RSA PRIVATE KEY-----\r\n" +
+                "Proc-Type: 4,ENCRYPTED\r\n" +
+                "DEK-Info: data data data\r\n" +
+                "\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
+                "sample/sample/sample/sample/sample/sample/sample/sampl==\r\n" +
+                "-----END RSA PRIVATE KEY-----";
+
 
             var defaultValues = [
                 {
@@ -42,7 +80,7 @@
                         },
                         {
                             id: ":input.param[name=redirect_uri]",
-                            defaultValue: "http://localhost:3000/callback"
+                            defaultValue: redirectUrl
                         },
                     ]
                 },
@@ -110,7 +148,7 @@
                         },
                         {
                             id: ":input.param[name=redirect_uri]",
-                            defaultValue: "http://localhost:3000/empty"
+                            defaultValue: redirectUrl
                         },
                     ]
                 },
@@ -152,7 +190,7 @@
                         },
                         {
                             id: ":input.param[name=redirect_uri]",
-                            defaultValue: "http://localhost:3000/empty"
+                            defaultValue: redirectUrl
                         },
                         {
                             id: ":input.param[name=client_id]",
@@ -161,6 +199,10 @@
                         {
                             id: ":input.param[name=client_secret]",
                             defaultValue: clientSecret
+                        },
+                        {
+                            id: ":input.security[name=client_id]",
+                            defaultValue: clientId
                         },
                     ]
                 },
@@ -185,6 +227,18 @@
                         {
                             id: ":input.header[name=Cache-Control]",
                             defaultValue: "no-cache"
+                        },
+                        {
+                            id: ":input.security[name=client_id]",
+                            defaultValue: atmosphereSecurityClientId
+                        },
+                        {
+                            id: ":input.security[name=passphrase]",
+                            defaultValue: atmospherePassphrase
+                        },
+                        {
+                            id: ":input.security[name=certificate_content]",
+                            defaultValue: atmosphereKeyCertContent
                         },
                     ]
                 },
@@ -223,8 +277,12 @@
 
                 var url = $('#formAuthPopup input.url').val();
                 var params = $('#formAuthPopup input.param').serialize();
+                var authWindowUrl = url+"?"+params;
 
-                authWindowObject = window.open(url+"?"+params, authWindowName, authWindowAttrs);
+                console.log("authWindowUrl="+authWindowUrl);
+                $("#formAuthenticate").find("textarea.response").val(authWindowUrl);
+
+                authWindowObject = window.open(authWindowUrl, authWindowName, authWindowAttrs);
             });
 
             $("#formAuthApi").submit(function (event) {
@@ -236,6 +294,7 @@
                 var headers = $form.find(':input.header').serialize();
                 var params = $form.find(':input.param').serialize();
                 var auth = $form.find(':input.auth').serialize();
+                var security = $form.find(':input.security').serialize();
 
                 $.ajax({
                     url: "/post",
@@ -245,6 +304,7 @@
                         headers: headers,
                         params: params,
                         auth: auth,
+                        security: security,
                     },
                     type: "POST",
                     success: function (data) {
@@ -264,6 +324,7 @@
                 var headers = $form.find(':input.header').serialize();
                 var params = $form.find(':input.param').serialize();
                 var auth = $form.find(':input.auth').serialize();
+                var security = $form.find(':input.security').serialize();
 
                 $.ajax({
                     url: "/get",
@@ -273,6 +334,7 @@
                         headers: headers,
                         params: params,
                         auth: auth,
+                        security: security,
                     },
                     type: "POST",
                     success: function (data) {
@@ -294,6 +356,7 @@
                 var headers = $form.find(':input.header').serialize();
                 var params = $form.find(':input.param').serialize();
                 var auth = $form.find(':input.auth').serialize();
+                var security = $form.find(':input.security').serialize();
 
                 $.ajax({
                     url: "/post",
@@ -303,6 +366,7 @@
                         headers: headers,
                         params: params,
                         auth: auth,
+                        security: security,
                     },
                     type: "POST",
                     success: function (data) {
@@ -322,6 +386,7 @@
                 var headers = $form.find(':input.header').serialize();
                 var params = $form.find(':input.param').serialize();
                 var auth = $form.find(':input.auth').serialize();
+                var security = $form.find(':input.security').serialize();
 
                 $.ajax({
                     url: "/get",
@@ -331,6 +396,7 @@
                         headers: headers,
                         params: params,
                         auth: auth,
+                        security: security,
                     },
                     type: "POST",
                     success: function (data) {
@@ -590,6 +656,34 @@
                 </div>
             </div>
 
+            <div class="security">
+                <h5>Security Header (Atmosphere)</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">security_level</label>
+                    <div class="col-lg-8">
+                        <select class="selectpicker security" name="security_level">
+                            <option value="">None</option>
+                            <option value="L1">L1</option>
+                            <option value="L2">L2</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">client_id</label>
+                    <div class="col-lg-8"><input class="form-control security" name="client_id" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">certificate_content</label>
+                    <div class="col-lg-8">
+                        <textarea class="form-control security" name="certificate_content" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">certificate_passphrase</label>
+                    <div class="col-lg-8"><input class="form-control security" name="certificate_passphrase" value=""></div>
+                </div>
+            </div>
+
             <div class="result">
                 <h5>Results</h5>
                 <div class="form-group">
@@ -643,6 +737,34 @@
                 <div class="form-group col-lg-12">
                     <label class="col-lg-2">Cache-Control</label>
                     <div class="col-lg-8"><input class="form-control header" name="Cache-Control" value="no-cache"></div>
+                </div>
+            </div>
+
+            <div class="security">
+                <h5>Security Header (Atmosphere)</h5>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">security_level</label>
+                    <div class="col-lg-8">
+                        <select class="selectpicker security" name="security_level">
+                            <option value="">None</option>
+                            <option value="L1">L1</option>
+                            <option value="L2">L2</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">client_id</label>
+                    <div class="col-lg-8"><input class="form-control security" name="client_id" value=""></div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">certificate_content</label>
+                    <div class="col-lg-8">
+                        <textarea class="form-control security" name="certificate_content" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="form-group col-lg-12">
+                    <label class="col-lg-2">passphrase</label>
+                    <div class="col-lg-8"><input class="form-control security" name="passphrase" value=""></div>
                 </div>
             </div>
 

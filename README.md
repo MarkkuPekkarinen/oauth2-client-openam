@@ -1,6 +1,9 @@
 # Test Client for OAuth2 authorization flow
 This client is set-up to work with OpenAM as the identity and OAuth provider.
 
+There is additional security options at Step 2 and 3.
+Default to "None" option.
+It is not required for standard OpenAM setup.
 
 ## Set-up
 

@@ -16,45 +16,53 @@
     <script>
 
         $(function() {
-            var baseUrl = "http://domain.com/openam";
-            var realm = "realm";
-            var clientId = "clientId";
-            var clientSecret = "clientSecret";
-            var redirectUrl = "http://localhost:3001/callback";
+            // var baseUrl = "http://myinfo.idahive.sg/openam";
+            var baseUrl = "https://myinfo.app.idahive.sg/openam";
+            var realm = "/";
+            var clientId = "myinfo";
+            var clientSecret = "my1nf0";
+            var redirectUrl = "https://myinfo-test.app.idahive.sg/callback";
 
-            var atmosphereSecurityClientId = "atmosphereClientId";
-            // L1 password or L2 certificate passphrase
-            var atmospherePassphrase = "atmosphereClientPasswordOrCertPassphrase";
+
+            // SingPass Special
+            var popupAuthUrl = "https://myinfo.app.idahive.sg/login";
+            var popupAuthRedirectUrl = redirectUrl; // + "?response_type=code&client_id=" + clientId;
+
+
+            var atmosphereSecurityClientId = "myinfo";
+            //var atmospherePassphrase = "my1nf0"; // Either L1 passphrase or L2 certificate passphrase
+            var atmospherePassphrase = "password";
+
             // Atmosphere L2 cert need PEM format, private key
             var atmosphereKeyCertContent = "-----BEGIN RSA PRIVATE KEY-----\r\n" +
                 "Proc-Type: 4,ENCRYPTED\r\n" +
-                "DEK-Info: data data data\r\n" +
+                "DEK-Info: DES-EDE3-CBC,9EC50AF3C96810CE\r\n" +
                 "\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sample/sample/s\r\n" +
-                "sample/sample/sample/sample/sample/sample/sample/sampl==\r\n" +
+                "j+nuK71MnCBT+qje9CqmqYo068MYqdjOvG4/fWp+BZ18wwX3FTm0i3UYbe7Y5kKR\r\n" +
+                "POAvKAo5y7ASoDOmgIR/KVU67igrWYily7VgjFS+ZJbgCxiZpET6CRy2nkHwRRDH\r\n" +
+                "0qdONkg+5XDBPkxXxpHqbcCPzsRi0aMsC4+QmwDzfiNgkBrFxBFfMmrc5mCYxPhg\r\n" +
+                "2KMgd41gzlMPIrIVpg0g3QBzGIkSI11/O4CdwlJvPIlWGDn2R+DXAl16mE0GtXd3\r\n" +
+                "l8h0F9pWMXrcTmursfwwWJPYFZ5Ir5R6IRBo3XKd7aPSgFmtfTXvb2AQuaVDY7zm\r\n" +
+                "DyBID6JIzOP3INsnSNpMsF/H+uTjKnYv5xNksfDVtqfo3AGoXNDfuFHTAtij0pib\r\n" +
+                "kBkiN3q//FoH5SBqh0br+1Uk+D5kUCR/uKV27SuJBBgbgnZCeU/qMbkxtjxbCoUd\r\n" +
+                "1KRSB8lWvBmxGS0rkGukHMDKtxW3VbAibF8uYb9c1BDEjGmxFy0dOnuy3Az8TV49\r\n" +
+                "JowWX1qGMG4EWcRzKye+S4YCpi9vYWOWKzIus9h7GHACudOF3edlCiD4lJY/5gCb\r\n" +
+                "c3/Yx4dG/nU4fX4xnswq76bUk49iOO/T9e5ugNqPVYSDQqM6Kif78DKIcHykCJxs\r\n" +
+                "Spq+onQUQMDc4I2QszPM4uTho8hCbWJ7LcCqzZQkB7kIiRHYIqitxY5dnyP4vLF0\r\n" +
+                "m8OZro0YWt+qPtswYJ24g91CuLL4+YCbxGvfConeP9DACwV1EZMwMB5pGjbPeAoI\r\n" +
+                "ZpdOWPVJCNRrgeOPEcBL+1GkM+RNM6KZVKbUF4nSrQGRs9UMb+hVHzhgWWi5uFqx\r\n" +
+                "OA+UkCQ/eRigHP/2Gh1Hf768dDTlBZf04qdK60WthiXIWEbUREcThrWjZ0vmH2JD\r\n" +
+                "JRKrj6IiRZlpe1oA+yfqJQIwYS2SvJr4pgkgLbvO2QrtZn3+/3AGGhuDRODnaAGL\r\n" +
+                "hiuB82MaoPcq4otCi6aETQjJba1IMAXuxo2AefIrFgtXMe6iM6eBjmfY7VbYweqa\r\n" +
+                "xO9H0/IUghnb+cKGGOSVgviqkQD4zcnPjctRVxJ6KVM7uvEeCqwUCSbAVWb8FlTp\r\n" +
+                "yeIky1oF27E2yJZGqrpBNWhQoh+IRyWO+Ls4vuOfImIHf+wcEjjC7p+5wa8JOjNs\r\n" +
+                "IfbIFIxYo2SWs0KueMMlkjon3HPdLYj091BH0TWAEDCzZnwbmPk1u602t0ifWjOm\r\n" +
+                "jq1yEJbw/mKmIZN63RDe33J5UVQoW9hsNOKrBHrpmFouHEwD3SvzR7Vux42WVi3l\r\n" +
+                "O4mdJPR3PeP9kZsK4f4IJPHhVjQUgkhm+WU37Le/0kthAUq8lcu4YewDEWrxS8gq\r\n" +
+                "9QRmLKOvWh27+i1djr13VxhkF6uLZJ4E3QXSGt0k1wTviQdCN6o2JfMs7QrH/G3J\r\n" +
+                "l7nHwC3OobsnfDpXUf3qp9K1FTCEmttb3kFjs8KEbj6NaELdI0Kf20AagF+gGCf+\r\n" +
+                "Ps9OY4VrLj8zR9EzsLhj7Ss7mYUdQeM0bsPyLkSZRTV7GSxG/j8rA6DhV3WXq9Op\r\n" +
+                "RiodEA8Wl+dQOJ6VcEakpNwuM5b5SdZDSuUoR0+lgtINjLS+04e/W00vhDxNa9iM\r\n" +
                 "-----END RSA PRIVATE KEY-----";
 
 
@@ -64,23 +72,11 @@
                     fields: [
                         {
                             id: ":input.url",
-                            defaultValue: baseUrl + "/oauth2/"+realm+"/authorize",
-                        },
-                        {
-                            id: ":input.param[name=realm]",
-                            defaultValue: realm
-                        },
-                        {
-                            id: ":input.param[name=response_type]",
-                            defaultValue: "code"
-                        },
-                        {
-                            id: ":input.param[name=client_id]",
-                            defaultValue: clientId
+                            defaultValue: popupAuthUrl,
                         },
                         {
                             id: ":input.param[name=redirect_uri]",
-                            defaultValue: redirectUrl
+                            defaultValue: popupAuthRedirectUrl
                         },
                     ]
                 },
@@ -116,7 +112,7 @@
                         {
                             id: ":input.url",
                             // defaultValue: "https://gateway.com/authorize",
-                            defaultValue: baseUrl + "/oauth2/"+realm+"/authorize",
+                            defaultValue: baseUrl + "/oauth2"+realm+"/authorize",
                         },
                         {
                             id: ":input.return[name=return]",
@@ -157,8 +153,8 @@
                     fields: [
                         {
                             id: ":input.url",
-                            // defaultValue: "https://gateway.com/accesstoken",
-                            defaultValue: baseUrl + "/oauth2/"+realm+"/access_token",
+                            defaultValue: "https://nd-myinfo.idahive.sg/accesstoken",
+                            // defaultValue: baseUrl + "/oauth2"+realm+"/access_token",
                         },
                         {
                             id: ":input.return[name=return]",
@@ -211,10 +207,9 @@
                     fields: [
                         {
                             id: ":input.url",
-                            // defaultValue: "https://gateway.com/iptest",
+                            defaultValue: "https://nd-myinfo.idahive.sg/iptest",
                             // defaultValue: "https://jsonplaceholder.typicode.com/posts/1",
-                            defaultValue: baseUrl + "/oauth2/"+realm+"/userinfo",
-
+                            // defaultValue: baseUrl + "/oauth2"+realm+"/userinfo",
                         },
                         {
                             id: ":input.return[name=return]",
@@ -264,19 +259,22 @@
 
             var authWindowName = "windowAuth";
             var authWindowAttrs = 'status=1' +
-                    ',resizable=1' +
-                    ',scrollbars=1' +
-                    ',width=500' +
-                    ',height=500' +
-                    ',left=0' +
-                    ',top=0';
+                ',resizable=1' +
+                ',scrollbars=1' +
+                ',width=500' +
+                ',height=500' +
+                ',left=0' +
+                ',top=0';
             var authWindowObject;
 
             $("#formAuthPopup span.url").click(function(event){
                 event.preventDefault();
 
                 var url = $('#formAuthPopup input.url').val();
-                var params = $('#formAuthPopup input.param').serialize();
+                var params = decodeURIComponent($('#formAuthPopup input.param').filter(function () {
+                    return !!this.value;
+                }).serialize());
+                console.log("params="+params);
                 var authWindowUrl = url+"?"+params;
 
                 console.log("authWindowUrl="+authWindowUrl);
@@ -423,362 +421,364 @@
 
 
 <body>
-    <h1>Test OAuth Steps</h1>
+<h1>Test OAuth Steps</h1>
 
-    <p>&nbsp;</p>
-    <h3>OAuth Details</h3>
-    <p>&nbsp;</p>
+<p>&nbsp;</p>
+<h3>OAuth Details</h3>
+<p>&nbsp;</p>
 
 
-    <div>
-        <h4 class="toggle_header step1-popup">Step 1 - Login Popup</h4>
-        <form id="formAuthPopup" class="toggle_content step1-popup hidden">
+<div>
+    <h4 class="toggle_header step1-popup">Step 1 - Login Popup</h4>
+    <form id="formAuthPopup" class="toggle_content step1-popup hidden">
+        <div class="form-group col-lg-12">
+            <label class="col-lg-2">Auth URL (Popup)</label>
+            <div class="col-lg-6"><input type="url" class="form-control url" value=""></div>
+            <label class="col-lg-2"><span class="btn-link url">Open URL (Popup)</span></label>
+        </div>
+
+        <div class="params">
+            <h5>Params</h5>
             <div class="form-group col-lg-12">
-                <label class="col-lg-2">Auth URL (Popup)</label>
-                <div class="col-lg-6"><input type="url" class="form-control url" value=""></div>
-                <label class="col-lg-2"><span class="btn-link url">Open URL (Popup)</span></label>
+                <label class="col-lg-2">realm</label>
+                <div class="col-lg-8"><input class="form-control param" name="realm" value=""></div>
             </div>
-
-            <div class="params">
-                <h5>Params</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">realm</label>
-                    <div class="col-lg-8"><input class="form-control param" name="realm" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">response_type</label>
-                    <div class="col-lg-8"><input class="form-control param" name="response_type" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">client_id</label>
-                    <div class="col-lg-8"><input class="form-control param" name="client_id" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">redirect_uri</label>
-                    <div class="col-lg-8"><input class="form-control param" name="redirect_uri" value=""></div>
-                </div>
-            </div>
-
-            <div class="result">
-                <h5>Results</h5>
-                <div class="form-group">
-                    <label>Response</label>
-                    <textarea class="form-control response" rows="3"></textarea>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <p>&nbsp;</p>
-
-    <div>
-        <h4 class="toggle_header step1a">Step 1a - Login Auth API</h4>
-        <form id="formAuthApi" class="toggle_content step1a hidden">
             <div class="form-group col-lg-12">
-                <label class="col-lg-2">Login API URL (POST)</label>
-                <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+                <label class="col-lg-2">response_type</label>
+                <div class="col-lg-8"><input class="form-control param" name="response_type" value=""></div>
             </div>
-
-            <div class="return">
-                <h5>Return</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">return</label>
-                    <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
-                </div>
-            </div>
-
-            <div class="headers">
-                <h5>Headers</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">X-OpenAM-Username</label>
-                    <div class="col-lg-8"><input class="form-control header" name="X-OpenAM-Username" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">X-OpenAM-Password</label>
-                    <div class="col-lg-8"><input class="form-control header" name="X-OpenAM-Password" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">Content-Type</label>
-                    <div class="col-lg-8"><input class="form-control header" name="Content-Type" value=""></div>
-                </div>
-            </div>
-
-            <div class="result">
-                <h5>Results</h5>
-                <div class="form-group">
-                    <label>Response</label>
-                    <textarea class="form-control response" rows="3"></textarea>
-                </div>
-            </div>
-
-
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
-
-    <p>&nbsp;</p>
-
-    <div>
-        <h4 class="toggle_header step1b">Step 1b - Authorize (GET)</h4>
-        <form id="formAuthenticate" class="toggle_content step1b hidden">
             <div class="form-group col-lg-12">
-                <label class="col-lg-2">Authentication URL</label>
-                <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+                <label class="col-lg-2">client_id</label>
+                <div class="col-lg-8"><input class="form-control param" name="client_id" value=""></div>
             </div>
-
-            <div class="return">
-                <h5>Return</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">return</label>
-                    <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
-                </div>
-            </div>
-
-            <div class="headers">
-                <h5>Headers</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">Cookie</label>
-                    <div class="col-lg-8"><input class="form-control header" name="Cookie" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">Content-Type</label>
-                    <div class="col-lg-8"><input class="form-control header" name="Content-Type" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">Cache-Control</label>
-                    <div class="col-lg-8"><input class="form-control header" name="Cache-Control" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">save_consent</label>
-                    <div class="col-lg-8"><input class="form-control header" name="save_consent" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">decision</label>
-                    <div class="col-lg-8"><input class="form-control header" name="decision" value=""></div>
-                </div>
-            </div>
-
-            <div class="params">
-                <h5>Params</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">response_type</label>
-                    <div class="col-lg-8"><input class="form-control param" name="response_type" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">client_id</label>
-                    <div class="col-lg-8"><input class="form-control param" name="client_id" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">redirect_uri</label>
-                    <div class="col-lg-8"><input class="form-control param" name="redirect_uri" value=""></div>
-                </div>
-            </div>
-
-            <div class="result">
-                <h5>Results</h5>
-                <div class="form-group">
-                    <label>Response</label>
-                    <textarea class="form-control response" rows="3"></textarea>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
-
-    <p>&nbsp;</p>
-
-    <div>
-        <h4 class="toggle_header step2">Step 2 - Get Access Token (POST)</h4>
-        <form id="formAccessToken" class="toggle_content step2 hidden">
             <div class="form-group col-lg-12">
-                <label class="col-lg-2">Access Token URL</label>
-                <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+                <label class="col-lg-2">redirect_uri</label>
+                <div class="col-lg-8"><input class="form-control param" name="redirect_uri" value=""></div>
             </div>
+        </div>
 
-            <div class="return">
-                <h5>Return</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">return</label>
-                    <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
-                </div>
+        <div class="result">
+            <h5>Results</h5>
+            <div class="form-group">
+                <label>Response</label>
+                <textarea class="form-control response" rows="3"></textarea>
             </div>
+        </div>
+    </form>
+</div>
 
-            <div class="auth">
-                <h5>Basic Auth</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">username</label>
-                    <div class="col-lg-8"><input class="form-control auth" name="username" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">password</label>
-                    <div class="col-lg-8"><input class="form-control auth" name="password" value=""></div>
-                </div>
-            </div>
+<p>&nbsp;</p>
 
-            <div class="headers">
-                <h5>Headers</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">Content-Type</label>
-                    <div class="col-lg-8"><input class="form-control header" name="Content-Type" value="application/x-www-form-urlencoded"></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">Cache-Control</label>
-                    <div class="col-lg-8"><input class="form-control header" name="Cache-Control" value="no-cache"></div>
-                </div>
-            </div>
+<div>
+    <h4 class="toggle_header step1a">Step 1a - Login Auth API</h4>
+    <form id="formAuthApi" class="toggle_content step1a hidden">
+        <div class="form-group col-lg-12">
+            <label class="col-lg-2">Login API URL (POST)</label>
+            <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+        </div>
 
-            <div class="params">
-                <h5>Params</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">grant_type</label>
-                    <div class="col-lg-8"><input class="form-control param" name="grant_type" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">realm</label>
-                    <div class="col-lg-8"><input class="form-control param" name="realm" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">code</label>
-                    <div class="col-lg-8"><input class="form-control param" name="code" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">redirect_uri</label>
-                    <div class="col-lg-8"><input class="form-control param" name="redirect_uri" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">client_id</label>
-                    <div class="col-lg-8"><input class="form-control param" name="client_id" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">client_secret</label>
-                    <div class="col-lg-8"><input class="form-control param" name="client_secret" value=""></div>
-                </div>
-            </div>
-
-            <div class="security">
-                <h5>Security Header (Atmosphere)</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">security_level</label>
-                    <div class="col-lg-8">
-                        <select class="selectpicker security" name="security_level">
-                            <option value="">None</option>
-                            <option value="L1">L1</option>
-                            <option value="L2">L2</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">client_id</label>
-                    <div class="col-lg-8"><input class="form-control security" name="client_id" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">certificate_content</label>
-                    <div class="col-lg-8">
-                        <textarea class="form-control security" name="certificate_content" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">certificate_passphrase</label>
-                    <div class="col-lg-8"><input class="form-control security" name="certificate_passphrase" value=""></div>
-                </div>
-            </div>
-
-            <div class="result">
-                <h5>Results</h5>
-                <div class="form-group">
-                    <label>Response</label>
-                    <textarea class="form-control response" rows="3"></textarea>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
-
-    <p>&nbsp;</p>
-
-    <div>
-        <h4 class="toggle_header step3">Step 3 - Call API with Access Token (GET)</h4>
-        <form id="formCallApi" class="toggle_content step3 hidden">
+        <div class="return">
+            <h5>Return</h5>
             <div class="form-group col-lg-12">
-                <label class="col-lg-2">API URL</label>
-                <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+                <label class="col-lg-2">return</label>
+                <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
             </div>
+        </div>
 
-            <div class="return">
-                <h5>Return</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">return</label>
-                    <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
+        <div class="headers">
+            <h5>Headers</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">X-OpenAM-Username</label>
+                <div class="col-lg-8"><input class="form-control header" name="X-OpenAM-Username" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">X-OpenAM-Password</label>
+                <div class="col-lg-8"><input class="form-control header" name="X-OpenAM-Password" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Content-Type</label>
+                <div class="col-lg-8"><input class="form-control header" name="Content-Type" value=""></div>
+            </div>
+        </div>
+
+        <div class="result">
+            <h5>Results</h5>
+            <div class="form-group">
+                <label>Response</label>
+                <textarea class="form-control response" rows="3"></textarea>
+            </div>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<p>&nbsp;</p>
+
+<div>
+    <h4 class="toggle_header step1b">Step 1b - Authorize (GET)</h4>
+    <form id="formAuthenticate" class="toggle_content step1b hidden">
+        <div class="form-group col-lg-12">
+            <label class="col-lg-2">Authentication URL</label>
+            <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+        </div>
+
+        <div class="return">
+            <h5>Return</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">return</label>
+                <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
+            </div>
+        </div>
+
+        <div class="headers">
+            <h5>Headers</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Cookie</label>
+                <div class="col-lg-8"><input class="form-control header" name="Cookie" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Content-Type</label>
+                <div class="col-lg-8"><input class="form-control header" name="Content-Type" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Cache-Control</label>
+                <div class="col-lg-8"><input class="form-control header" name="Cache-Control" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">save_consent</label>
+                <div class="col-lg-8"><input class="form-control header" name="save_consent" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">decision</label>
+                <div class="col-lg-8"><input class="form-control header" name="decision" value=""></div>
+            </div>
+        </div>
+
+        <div class="params">
+            <h5>Params</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">response_type</label>
+                <div class="col-lg-8"><input class="form-control param" name="response_type" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">client_id</label>
+                <div class="col-lg-8"><input class="form-control param" name="client_id" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">redirect_uri</label>
+                <div class="col-lg-8"><input class="form-control param" name="redirect_uri" value=""></div>
+            </div>
+        </div>
+
+        <div class="result">
+            <h5>Results</h5>
+            <div class="form-group">
+                <label>Response</label>
+                <textarea class="form-control response" rows="3"></textarea>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<p>&nbsp;</p>
+
+<div>
+    <h4 class="toggle_header step2">Step 2 - Get Access Token (POST)</h4>
+    <form id="formAccessToken" class="toggle_content step2 hidden">
+        <div class="form-group col-lg-12">
+            <label class="col-lg-2">Access Token URL</label>
+            <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+        </div>
+
+        <div class="return">
+            <h5>Return</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">return</label>
+                <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
+            </div>
+        </div>
+
+        <div class="auth">
+            <h5>Basic Auth</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">username</label>
+                <div class="col-lg-8"><input class="form-control auth" name="username" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">password</label>
+                <div class="col-lg-8"><input class="form-control auth" name="password" value=""></div>
+            </div>
+        </div>
+
+        <div class="headers">
+            <h5>Headers</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Content-Type</label>
+                <div class="col-lg-8"><input class="form-control header" name="Content-Type" value="application/x-www-form-urlencoded"></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Cache-Control</label>
+                <div class="col-lg-8"><input class="form-control header" name="Cache-Control" value="no-cache"></div>
+            </div>
+        </div>
+
+        <div class="params">
+            <h5>Params</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">grant_type</label>
+                <div class="col-lg-8"><input class="form-control param" name="grant_type" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">realm</label>
+                <div class="col-lg-8"><input class="form-control param" name="realm" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">code</label>
+                <div class="col-lg-8"><input class="form-control param" name="code" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">redirect_uri</label>
+                <div class="col-lg-8"><input class="form-control param" name="redirect_uri" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">client_id</label>
+                <div class="col-lg-8"><input class="form-control param" name="client_id" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">client_secret</label>
+                <div class="col-lg-8"><input class="form-control param" name="client_secret" value=""></div>
+            </div>
+        </div>
+
+        <div class="security">
+            <h5>Security Header (Atmosphere)</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">security_level</label>
+                <div class="col-lg-8">
+                    <select class="selectpicker security" name="security_level">
+                        <option value="">None</option>
+                        <option value="L1">L1</option>
+                        <option value="L1-SHA">L1-SHA</option>
+                        <option value="L2">L2</option>
+                    </select>
                 </div>
             </div>
-
-            <!--
-            <div class="params">
-                <h5>Params</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">access_token</label>
-                    <div class="col-lg-8"><input class="form-control param" name="access_token" value=""></div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">client_id</label>
+                <div class="col-lg-8"><input class="form-control security" name="client_id" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">certificate_content</label>
+                <div class="col-lg-8">
+                    <textarea class="form-control security" name="certificate_content" rows="3"></textarea>
                 </div>
             </div>
-            -->
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">passphrase</label>
+                <div class="col-lg-8"><input class="form-control security" name="passphrase" value=""></div>
+            </div>
+        </div>
 
-            <div class="headers">
-                <h5>Headers</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">Authorization</label>
-                    <div class="col-lg-8"><input class="form-control header" name="Authorization" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">Content-Type</label>
-                    <div class="col-lg-8"><input class="form-control header" name="Content-Type" value="application/x-www-form-urlencoded"></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">Cache-Control</label>
-                    <div class="col-lg-8"><input class="form-control header" name="Cache-Control" value="no-cache"></div>
+        <div class="result">
+            <h5>Results</h5>
+            <div class="form-group">
+                <label>Response</label>
+                <textarea class="form-control response" rows="3"></textarea>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<p>&nbsp;</p>
+
+<div>
+    <h4 class="toggle_header step3">Step 3 - Call API with Access Token (GET)</h4>
+    <form id="formCallApi" class="toggle_content step3 hidden">
+        <div class="form-group col-lg-12">
+            <label class="col-lg-2">API URL</label>
+            <div class="col-lg-8"><input type="url" class="form-control url" value=""></div>
+        </div>
+
+        <div class="return">
+            <h5>Return</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">return</label>
+                <div class="col-lg-8"><input class="form-control return" name="return" value=""></div>
+            </div>
+        </div>
+
+        <!--
+        <div class="params">
+            <h5>Params</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">access_token</label>
+                <div class="col-lg-8"><input class="form-control param" name="access_token" value=""></div>
+            </div>
+        </div>
+        -->
+
+        <div class="headers">
+            <h5>Headers</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Authorization</label>
+                <div class="col-lg-8"><input class="form-control header" name="Authorization" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Content-Type</label>
+                <div class="col-lg-8"><input class="form-control header" name="Content-Type" value="application/x-www-form-urlencoded"></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">Cache-Control</label>
+                <div class="col-lg-8"><input class="form-control header" name="Cache-Control" value="no-cache"></div>
+            </div>
+        </div>
+
+        <div class="security">
+            <h5>Security Header (Atmosphere)</h5>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">security_level</label>
+                <div class="col-lg-8">
+                    <select class="selectpicker security" name="security_level">
+                        <option value="">None</option>
+                        <option value="L1">L1</option>
+                        <option value="L1-SHA">L1-SHA</option>
+                        <option value="L2">L2</option>
+                    </select>
                 </div>
             </div>
-
-            <div class="security">
-                <h5>Security Header (Atmosphere)</h5>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">security_level</label>
-                    <div class="col-lg-8">
-                        <select class="selectpicker security" name="security_level">
-                            <option value="">None</option>
-                            <option value="L1">L1</option>
-                            <option value="L2">L2</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">client_id</label>
-                    <div class="col-lg-8"><input class="form-control security" name="client_id" value=""></div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">certificate_content</label>
-                    <div class="col-lg-8">
-                        <textarea class="form-control security" name="certificate_content" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="form-group col-lg-12">
-                    <label class="col-lg-2">passphrase</label>
-                    <div class="col-lg-8"><input class="form-control security" name="passphrase" value=""></div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">client_id</label>
+                <div class="col-lg-8"><input class="form-control security" name="client_id" value=""></div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">certificate_content</label>
+                <div class="col-lg-8">
+                    <textarea class="form-control security" name="certificate_content" rows="3"></textarea>
                 </div>
             </div>
-
-            <div class="result">
-                <h5>Results</h5>
-                <div class="form-group">
-                    <label>Response</label>
-                    <textarea class="form-control response" rows="3"></textarea>
-                </div>
+            <div class="form-group col-lg-12">
+                <label class="col-lg-2">passphrase</label>
+                <div class="col-lg-8"><input class="form-control security" name="passphrase" value=""></div>
             </div>
+        </div>
 
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
+        <div class="result">
+            <h5>Results</h5>
+            <div class="form-group">
+                <label>Response</label>
+                <textarea class="form-control response" rows="3"></textarea>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
 
 
 </body>
